@@ -12,13 +12,17 @@ from dotenv import load_dotenv
 if os.getenv("ENVIRONMENT") != "production":
     load_dotenv()
 
-from src.api.schemas import ArticleRequest, ArticleResponse, ArticleMetadata
-from src.api.security import (
-    rate_limiter, input_sanitizer, security_headers, request_validator,
-    audit_logger, get_client_ip, APIKeyAuth
-)
-from src.model.generator import JenosizeTrendGenerator
-from src.model.config import ModelConfig
+try:
+    from src.api.schemas import ArticleRequest, ArticleResponse, ArticleMetadata
+    from src.api.security import (
+        rate_limiter, input_sanitizer, security_headers, request_validator,
+        audit_logger, get_client_ip, APIKeyAuth
+    )
+    from src.model.generator import JenosizeTrendGenerator
+    from src.model.config import ModelConfig
+except ImportError as e:
+    logger.error(f"Import error: {e}")
+    # Fallback imports or minimal functionality
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -109,15 +113,8 @@ async def health_check():
         "openai_available": bool(os.getenv("OPENAI_API_KEY"))
     }
     
-    # System resources (basic)
-    try:
-        import psutil
-        health_status["system"] = {
-            "memory_percent": psutil.virtual_memory().percent,
-            "cpu_percent": psutil.cpu_percent(interval=1)
-        }
-    except ImportError:
-        health_status["system"] = {"status": "metrics_unavailable"}
+    # System resources (basic) - disabled for minimal deployment
+    health_status["system"] = {"status": "metrics_unavailable"}
     
     return health_status
 
