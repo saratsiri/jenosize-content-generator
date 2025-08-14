@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile.fast"
 
 [deploy]
 startCommand = "./start-api.sh"
-healthcheckPath = "/health"
+healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
