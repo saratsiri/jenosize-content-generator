@@ -115,9 +115,10 @@ class ModelCache:
 class JenosizeTrendGenerator:
     """Enhanced AI article generator with caching and error handling"""
     
-    def __init__(self, config=None, enable_caching: bool = True):
+    def __init__(self, config=None, enable_caching: bool = True, skip_connection_test: bool = False):
         self.config = config
         self.enable_caching = enable_caching
+        self.skip_connection_test = skip_connection_test
         self.cache = ModelCache() if enable_caching else None
         self.model = None
         self.tokenizer = None
@@ -168,8 +169,12 @@ class JenosizeTrendGenerator:
                 model=self.config.model_name
             )
             
-            # Test connection to verify it works
-            connection_ok = self.claude_handler.test_connection()
+            # Test connection to verify it works (skip if requested)
+            if self.skip_connection_test:
+                logger.info("⏭️ Skipping Claude API connection test for faster startup")
+                connection_ok = True
+            else:
+                connection_ok = self.claude_handler.test_connection()
             
             if connection_ok:
                 logger.info("✅ Claude API connection verified - ready for generation")

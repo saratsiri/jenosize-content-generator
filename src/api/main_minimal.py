@@ -53,7 +53,7 @@ api_key_auth = APIKeyAuth(api_keys) if api_keys else APIKeyAuth()
 # Initialize basic generator (no ML dependencies for now)
 logger.info("Initializing basic content generator...")
 config = ModelConfig()
-generator = JenosizeTrendGenerator(config)
+generator = JenosizeTrendGenerator(config, skip_connection_test=True)  # Skip test for faster startup
 style_generator = None  # Disabled temporarily for Railway deployment
 logger.info("Basic generator initialized successfully")
 
