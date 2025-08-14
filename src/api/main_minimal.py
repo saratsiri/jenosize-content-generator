@@ -104,40 +104,40 @@ if MODEL_AVAILABLE:
 else:
     logger.info("Model not available, using mock responses")
 
-# Security middleware (if available)
-if SECURITY_AVAILABLE:
-    @app.middleware("http")
-    async def security_middleware(request: Request, call_next):
-        """Add security headers and rate limiting"""
-        
-        # Get client info
-        client_ip = get_client_ip(request)
-        user_agent = request.headers.get("user-agent", "unknown")
-        
-        # Log request
-        audit_logger.log_request(request, client_ip, user_agent)
-        
-        # Rate limiting
-        if not rate_limiter.is_allowed(client_ip):
-            return JSONResponse(
-                status_code=429,
-                content={"error": "Rate limit exceeded", "retry_after": 60}
-            )
-        
-        # Input validation
-        if not request_validator.is_safe_request(request):
-            return JSONResponse(
-                status_code=400,
-                content={"error": "Invalid request format"}
-            )
-        
-        # Process request
-        response = await call_next(request)
-        
-        # Add security headers
-        security_headers.add_headers(response)
-        
-        return response
+# Security middleware disabled for Railway compatibility
+# if SECURITY_AVAILABLE:
+#     @app.middleware("http")
+#     async def security_middleware(request: Request, call_next):
+#         """Add security headers and rate limiting"""
+#         
+#         # Get client info
+#         client_ip = get_client_ip(request)
+#         user_agent = request.headers.get("user-agent", "unknown")
+#         
+#         # Log request
+#         audit_logger.log_request(request, client_ip, user_agent)
+#         
+#         # Rate limiting
+#         if not rate_limiter.is_allowed(client_ip):
+#             return JSONResponse(
+#                 status_code=429,
+#                 content={"error": "Rate limit exceeded", "retry_after": 60}
+#             )
+#         
+#         # Input validation
+#         if not request_validator.is_safe_request(request):
+#             return JSONResponse(
+#                 status_code=400,
+#                 content={"error": "Invalid request format"}
+#             )
+#         
+#         # Process request
+#         response = await call_next(request)
+#         
+#         # Add security headers
+#         security_headers.add_headers(response)
+#         
+#         return response
 
 # Health check endpoint
 @app.get("/health")
