@@ -34,7 +34,9 @@ class ModelConfig:
         if not self.openai_api_key:
             self.openai_api_key = os.getenv("OPENAI_API_KEY")
         if not self.claude_api_key:
-            self.claude_api_key = os.getenv("CLAUDE_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+            raw_key = os.getenv("CLAUDE_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+            # Strip whitespace and newlines from API key
+            self.claude_api_key = raw_key.strip() if raw_key else None
         
         # Auto-detect provider based on available API keys
         if self.claude_api_key:

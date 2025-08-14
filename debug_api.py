@@ -14,6 +14,11 @@ if claude_key:
     print(f"CLAUDE_API_KEY found: {claude_key[:15]}...{claude_key[-10:]} (length: {len(claude_key)})")
     print(f"First char: '{claude_key[0]}', Last char: '{claude_key[-1]}'")
     print(f"Contains newlines: {repr(claude_key) != claude_key}")
+    
+    # Test stripped version
+    stripped_key = claude_key.strip()
+    print(f"After stripping: {stripped_key[:15]}...{stripped_key[-10:]} (length: {len(stripped_key)})")
+    print(f"Stripped contains newlines: {repr(stripped_key) != stripped_key}")
 else:
     print("CLAUDE_API_KEY not found")
 
