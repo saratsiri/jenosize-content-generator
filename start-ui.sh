@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Production startup script for Streamlit on Render
-export PYTHONPATH="/opt/render/project/src:$PYTHONPATH"
+# Production startup script for Streamlit on Fly.io
+export PYTHONPATH="/app/src:$PYTHONPATH"
 
 # Start the Streamlit application
 streamlit run demo/app.py \

@@ -1,0 +1,24 @@
+app = 'jenosize-ui'
+primary_region = 'sjc'
+
+[build]
+  dockerfile = 'Dockerfile.ui'
+
+[env]
+  ENVIRONMENT = 'production'
+  PYTHONPATH = '/app/src'
+
+[http_service]
+  internal_port = 8501
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[processes]
+  app = './start-ui.sh'
