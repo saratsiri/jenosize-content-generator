@@ -38,7 +38,14 @@ st.title("📝 Jenosize Trend Generator")
 
 # API configuration (minimal sidebar)
 with st.sidebar:
-    api_url = st.text_input("API Endpoint", value=os.getenv("API_URL", "http://localhost:8000"))
+    # Construct API URL from host environment variable or use default
+    api_host = os.getenv("API_HOST")
+    if api_host:
+        default_api_url = f"https://{api_host}"
+    else:
+        default_api_url = "http://localhost:8000"
+    
+    api_url = st.text_input("API Endpoint", value=default_api_url)
     # Simple connection status
     try:
         health_response = requests.get(f"{api_url}/health", timeout=3)

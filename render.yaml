@@ -24,7 +24,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: ./start-ui.sh
     envVars:
-      - key: API_URL
+      - key: API_HOST
         fromService:
           type: web
           name: jenosize-api
