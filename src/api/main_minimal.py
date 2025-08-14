@@ -182,42 +182,54 @@ async def generate_article(request: dict):
         logger.info(f"Generating article for topic: {topic}")
         
         if generator:
+            # Prepare keywords from request
+            keywords = request.get("keywords", [])
+            if isinstance(keywords, str):
+                keywords = [k.strip() for k in keywords.split(',') if k.strip()]
+            elif not keywords:
+                # Default keywords if none provided
+                keywords = [topic, request.get("category", "business")]
+                
             # Use appropriate method based on generator type
             if hasattr(generator, 'generate_with_style_matching'):
                 # Style-aware generator
                 article_result = generator.generate_with_style_matching(
                     topic=topic,
                     category=request.get("category", "business"),
-                    industry=request.get("industry", "technology"),
+                    keywords=keywords,
                     target_audience=request.get("target_audience", "business professionals"),
                     tone=request.get("tone", "professional"),
-                    length=request.get("content_length", "medium")
+                    target_word_count=800,
+                    use_similar_examples=True,
+                    num_style_examples=3
                 )
             elif hasattr(generator, 'generate_article'):
                 # Basic generator
                 article_result = generator.generate_article(
                     topic=topic,
                     category=request.get("category", "business"),
-                    industry=request.get("industry", "technology"),
+                    keywords=keywords,
                     target_audience=request.get("target_audience", "business professionals"),
-                    tone=request.get("tone", "professional"),
-                    length=request.get("content_length", "medium")
+                    tone=request.get("tone", "professional")
                 )
             else:
                 # Unknown generator type
                 raise Exception("Generator has no supported generation method")
             
             if article_result and article_result.get('content'):
+                # Extract metadata from the generator result
+                result_metadata = article_result.get('metadata', {})
+                
                 return {
                     "title": article_result.get('title', topic),
                     "content": article_result['content'],
                     "success": True,
                     "metadata": {
-                        "category": request.get("category", "business"),
-                        "word_count": len(article_result['content'].split()),
-                        "model": article_result.get('model_used', 'claude-3-haiku'),
-                        "processing_time": article_result.get('processing_time', 0),
-                        "keywords": request.get("keywords", [])
+                        "category": result_metadata.get('category', request.get("category", "business")),
+                        "word_count": result_metadata.get('word_count', len(article_result['content'].split())),
+                        "model": result_metadata.get('model', 'claude-3-haiku'),
+                        "processing_time": result_metadata.get('processing_time', 0),
+                        "keywords": result_metadata.get('keywords', keywords)
                     }
                 }
         
