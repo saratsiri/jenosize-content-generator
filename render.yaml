@@ -28,7 +28,7 @@ services:
         fromService:
           type: web
           name: jenosize-api
-          property: url
+          property: host
       - key: ENVIRONMENT
         value: production
       - key: PYTHONPATH
