@@ -41,9 +41,15 @@ with st.sidebar:
     # Get API URL from Railway service URL or environment
     api_service_url = os.getenv("RAILWAY_SERVICE_JENOSIZE_API_URL")
     if api_service_url:
-        default_api_url = f"https://{api_service_url}"
+        # Railway provides the domain, we need to add https://
+        if api_service_url.startswith(('http://', 'https://')):
+            default_api_url = api_service_url
+        else:
+            default_api_url = f"https://{api_service_url}"
     else:
         default_api_url = "http://localhost:8000"
+    
+    st.write(f"🔗 Auto-detected API URL: {default_api_url}")
     
     api_url = st.text_input("API Endpoint", value=default_api_url)
     # Simple connection status
