@@ -38,10 +38,10 @@ st.title("📝 Jenosize Trend Generator")
 
 # API configuration (minimal sidebar)
 with st.sidebar:
-    # Construct API URL from host environment variable or use default
-    api_host = os.getenv("API_HOST")
-    if api_host:
-        default_api_url = f"https://{api_host}"
+    # Get API URL from Railway service URL or environment
+    api_service_url = os.getenv("RAILWAY_SERVICE_JENOSIZE_API_URL")
+    if api_service_url:
+        default_api_url = f"https://{api_service_url}"
     else:
         default_api_url = "http://localhost:8000"
     
