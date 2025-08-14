@@ -1,0 +1,14 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile.fast"
+
+[deploy]
+startCommand = "./start-api.sh"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[services.variables]
+ENVIRONMENT = "production"
+PYTHONPATH = "/app/src"
