@@ -42,6 +42,13 @@ except ImportError as e:
     logger.warning(f"Model modules not available: {e}")
     MODEL_AVAILABLE = False
 
+try:
+    from src.style_matcher.integrated_generator import StyleAwareContentGenerator
+    STYLE_MATCHING_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Style matching not available: {e}")
+    STYLE_MATCHING_AVAILABLE = False
+
 # Initialize FastAPI
 app = FastAPI(
     title="Jenosize Trend Articles Generator API",
@@ -73,10 +80,24 @@ style_generator = None
 
 if MODEL_AVAILABLE:
     try:
-        logger.info("Initializing basic content generator...")
+        logger.info("Initializing content generator...")
         config = ModelConfig()
-        generator = JenosizeTrendGenerator(config, skip_connection_test=True)
-        logger.info("Basic generator initialized successfully")
+        
+        # Try to initialize style-aware generator first (for quality)
+        if STYLE_MATCHING_AVAILABLE:
+            try:
+                logger.info("Initializing style-aware content generator...")
+                style_generator = StyleAwareContentGenerator(config)
+                style_generator.initialize_style_system()
+                generator = style_generator
+                logger.info("✅ Style-aware generator initialized - ready for high-quality articles")
+            except Exception as e:
+                logger.warning(f"Style matching failed, falling back to basic generator: {e}")
+                generator = JenosizeTrendGenerator(config, skip_connection_test=True)
+        else:
+            generator = JenosizeTrendGenerator(config, skip_connection_test=True)
+            
+        logger.info("Content generator initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize generator: {e}")
         generator = None
@@ -121,29 +142,12 @@ if SECURITY_AVAILABLE:
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    """Comprehensive health check with detailed metrics"""
-    
-    # Basic service status
-    health_status = {
+    """Simple health check"""
+    return {
         "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
         "service": "jenosize-api",
-        "version": "1.0.0",
-        "environment": os.getenv("ENVIRONMENT", "development")
+        "claude_ready": generator is not None
     }
-    
-    # Generator status
-    health_status["generators"] = {
-        "basic_generator": generator is not None,
-        "style_generator": style_generator is not None,
-        "claude_available": bool(os.getenv("CLAUDE_API_KEY")),
-        "openai_available": bool(os.getenv("OPENAI_API_KEY"))
-    }
-    
-    # System resources (basic) - disabled for minimal deployment
-    health_status["system"] = {"status": "metrics_unavailable"}
-    
-    return health_status
 
 # Root endpoint
 @app.get("/")

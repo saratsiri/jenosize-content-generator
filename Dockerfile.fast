@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_NO_CACHE_DIR=1
 
-# Copy CPU-only requirements
-COPY requirements-cpu.txt requirements.txt
+# Copy ML requirements for full functionality
+COPY requirements-ml.txt requirements.txt
 
 # Install dependencies with timeout and retries
 RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
