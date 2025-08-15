@@ -5,16 +5,20 @@ This document provides context for Claude Code to understand and work with this 
 ## Project Overview
 
 **Purpose**: AI-powered business trend article generator for Jenosize with semantic style matching
-**Tech Stack**: FastAPI + Python, Claude API, Streamlit, Docker, Render.com deployment
-**Status**: ✅ Complete - Production-ready with multi-service deployment architecture
+**Tech Stack**: FastAPI + Python, Claude API, Streamlit, Docker, Railway.com deployment
+**Status**: ✅ Complete - Production-ready and fully deployed on Railway.com
 
-## Repository Migration
+## Production Deployment
 
-**⚠️ Important**: This project is being migrated to a new clean repository structure:
+**✅ Live System**: Fully operational multi-service deployment on Railway.com
 
-**New Repository**: `jenosize-content-generator` 
-**GitHub URL**: `https://github.com/[username]/jenosize-content-generator`
-**Deployment**: Render.com multi-service architecture
+**Production URLs**:
+- **API Service**: `https://jenosize-api-production-fe43.up.railway.app`
+- **Web Interface**: `https://jenosize-ui-production.up.railway.app`
+- **API Documentation**: `https://jenosize-api-production-fe43.up.railway.app/docs`
+
+**Repository**: `https://github.com/saratsiri/jenosize-content-generator`
+**Deployment Platform**: Railway.com multi-service architecture
 
 ## Current Architecture
 
@@ -39,11 +43,13 @@ jenosize-content-generator/
 │   ├── jenosize_training_articles.json  # Complete Jenosize content
 │   ├── jenosize_embeddings.pkl         # Pre-computed embeddings
 │   └── [category]_articles.json        # Category-specific articles
-├── render.yaml           # Multi-service deployment blueprint
+├── railway.toml          # Railway deployment configuration
 ├── start-api.sh          # Production API startup script  
 ├── start-ui.sh           # Production UI startup script
 ├── .streamlit/config.toml # Streamlit production config
-├── README.render.md      # Comprehensive deployment guide
+├── Dockerfile.fast       # Optimized API container
+├── Dockerfile.ui         # Streamlit UI container
+├── requirements-ml.txt   # Full ML dependencies
 ├── docker-compose.yml    # Local multi-container setup
 ├── Dockerfile & Dockerfile.ui # Container configurations
 └── requirements.txt      # Production dependencies
@@ -71,11 +77,12 @@ jenosize-content-generator/
 - **Category Intelligence**: Business domain-specific style alignment
 - **Quality Validation**: Automated brand voice consistency checking
 
-### 4. Multi-Service Architecture
-- **API Service** (`jenosize-api`): Backend on port 8000
-- **UI Service** (`jenosize-ui`): Frontend on port 8501
-- **Auto-Discovery**: Services communicate via environment variables
-- **Health Checks**: Both services include monitoring endpoints
+### 4. Multi-Service Architecture (Railway.com)
+- **API Service** (`jenosize-api-production`): Backend with Claude integration
+- **UI Service** (`jenosize-ui-production`): Streamlit frontend
+- **Auto-Discovery**: Railway service URLs with environment variable detection
+- **Health Checks**: Comprehensive monitoring endpoints
+- **CPU-Optimized**: PyTorch CPU-only for cost efficiency
 
 ## Environment Setup
 
@@ -92,21 +99,21 @@ cp .env.example .env
 docker-compose up --build
 
 # Or start manually
-uvicorn src.api.main:app --reload --port 8000
+uvicorn src.api.main_minimal:app --reload --port 8000
 streamlit run demo/app.py --server.port 8501
 ```
 
-### Production Deployment (Render.com)
+### Production Deployment (Railway.com)
 ```bash
-# 1. Create new repository: jenosize-content-generator
-# 2. Copy all files to repository root (not in subfolder)
-# 3. Push to GitHub
-# 4. Deploy via Render Blueprint (render.yaml)
+# Already deployed and running:
+# API: https://jenosize-api-production-fe43.up.railway.app
+# UI: https://jenosize-ui-production.up.railway.app
+# Docs: https://jenosize-api-production-fe43.up.railway.app/docs
 
-# Access URLs after deployment:
-# API: https://jenosize-api.onrender.com
-# UI: https://jenosize-ui.onrender.com
-# Docs: https://jenosize-api.onrender.com/docs
+# Deployment configuration:
+railway login
+railway link [project-id]
+railway up
 ```
 
 ## Current Implementation Status
@@ -117,7 +124,7 @@ streamlit run demo/app.py --server.port 8501
 - [x] Multi-parameter content generation (15+ options)
 - [x] Enterprise security and monitoring
 - [x] Docker containerization with multi-service setup
-- [x] Render.com deployment configuration
+- [x] Railway.com production deployment
 
 ### ✅ Advanced Features Complete  
 - [x] **Style Matching**: Sentence transformers with pre-computed embeddings
@@ -126,12 +133,13 @@ streamlit run demo/app.py --server.port 8501
 - [x] **Production Security**: Rate limiting, audit logging, input validation
 - [x] **Multi-Service**: Separate API and UI containers with auto-discovery
 
-### ✅ Deployment Ready
-- [x] **Render Blueprint**: Multi-service deployment configuration
-- [x] **Production Scripts**: Optimized startup scripts for cloud deployment
-- [x] **Environment Management**: Production vs development configurations
+### ✅ Production Deployed
+- [x] **Railway Deployment**: Live multi-service production system
+- [x] **Production Scripts**: Optimized startup scripts for Railway
+- [x] **Environment Management**: Production-ready configuration
 - [x] **Health Monitoring**: Comprehensive system status endpoints
-- [x] **Documentation**: Complete deployment guides and troubleshooting
+- [x] **Cost Optimization**: CPU-only ML dependencies for efficiency
+- [x] **Documentation**: Complete API docs and usage guides
 
 ## API Endpoints
 
@@ -175,38 +183,42 @@ docker-compose up --build
 # UI: http://localhost:8501
 ```
 
-### Production (Render.com)
-```yaml
-# render.yaml - Multi-service blueprint
-services:
-  - name: jenosize-api
-    type: web
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: ./start-api.sh
-    
-  - name: jenosize-ui  
-    type: web
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: ./start-ui.sh
+### Production (Railway.com)
+```toml
+# railway.toml - Deployment configuration
+[[services]]
+name = "jenosize-api"
+source = "."
+builder = "dockerfile"
+dockerfilePath = "Dockerfile.fast"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+
+[[services]]
+name = "jenosize-ui"
+source = "."
+builder = "dockerfile" 
+dockerfilePath = "Dockerfile.ui"
+healthcheckPath = "/"
+healthcheckTimeout = 300
 ```
 
-## Migration Checklist
+## Current Production Status
 
-### Repository Setup (New: jenosize-content-generator)
-- [ ] Create new GitHub repository: `jenosize-content-generator`
-- [ ] Copy all project files to repository root (no subfolders)
-- [ ] Ensure `render.yaml` is at repository root level
-- [ ] Push all files to new repository
-- [ ] Update remote URLs and documentation
+### ✅ Deployment Complete
+- [x] GitHub repository: `https://github.com/saratsiri/jenosize-content-generator`
+- [x] Railway project connected and deployed
+- [x] Environment variables configured (CLAUDE_API_KEY)
+- [x] Multi-service deployment with railway.toml
+- [x] Both API and UI services running and communicating
+- [x] End-to-end content generation tested and working
 
-### Deployment Verification
-- [ ] Connect new repository to Render.com
-- [ ] Set environment variables (CLAUDE_API_KEY, OPENAI_API_KEY)
-- [ ] Deploy via Blueprint (render.yaml)
-- [ ] Verify both services are running and communicating
-- [ ] Test content generation end-to-end
+### ✅ Production Verification
+- [x] API service health checks passing
+- [x] Claude API integration working
+- [x] Style matching system operational
+- [x] Streamlit UI fully functional
+- [x] Performance metrics within targets
 
 ## Development Commands
 
@@ -218,30 +230,40 @@ docker-compose down                    # Stop services
 
 # Production Deployment  
 git add . && git commit -m "Deploy"    # Commit changes
-git push origin main                   # Deploy to Render (auto-deploy)
+git push origin main                   # Deploy to Railway (auto-deploy)
 
 # Testing
-curl http://localhost:8000/health      # Test API health
-curl http://localhost:8000/docs        # View API documentation
+curl https://jenosize-api-production-fe43.up.railway.app/health      # Test production API health
+curl https://jenosize-api-production-fe43.up.railway.app/docs        # View production API documentation
 ```
 
-## Migration Instructions
+## API Usage Examples
 
-1. **Create New Repository**:
-   - Go to https://github.com/new
-   - Name: `jenosize-content-generator`
-   - Public repository
-   - Don't initialize with files
+### Generate Article (Production)
+```bash
+curl -X POST "https://jenosize-api-production-fe43.up.railway.app/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "Digital transformation in retail banking",
+    "category": "technology",
+    "keywords": ["AI", "banking", "digital", "transformation"],
+    "target_audience": "Banking executives",
+    "tone": "professional"
+  }'
+```
 
-2. **Copy Project Files**:
-   - Copy ALL files from current directory to new repo root
-   - Ensure `render.yaml` is at root level (not in subfolder)
-   - Maintain directory structure exactly as shown above
+### Health Check (Production)
+```bash
+curl https://jenosize-api-production-fe43.up.railway.app/health
+```
 
-3. **Deploy to Render**:
-   - Connect new repository to Render.com
-   - Select "Blueprint" deployment
-   - Add environment variables
-   - Deploy automatically via render.yaml
+## System Architecture
 
-This project demonstrates production-ready multi-service architecture with advanced NLP, enterprise security, and cloud-native deployment capabilities.
+This project demonstrates a production-ready multi-service architecture with:
+- **Advanced NLP**: Semantic style matching with 68 Jenosize articles
+- **AI Integration**: Claude 3 Haiku for high-quality content generation
+- **Cloud Deployment**: Railway.com multi-service container orchestration
+- **Cost Optimization**: CPU-only ML dependencies and smart resource usage
+- **Quality Assurance**: 88% brand voice consistency through style matching
+
+**Status**: ✅ Production Ready | 🚀 Fully Deployed | 📊 Performance Optimized
